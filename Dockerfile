@@ -19,6 +19,17 @@ RUN sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
 # SSH login fix. Otherwise user is kicked off after login
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
+# Add user
+RUN useradd -ms /bin/bash $USER
+RUN echo "$USER:$USER" | chpasswd
+USER $USER
+WORKDIR /home/$USER
+
+# capistrano dirs
+RUN mkdir -p ~/www/logs
+RUN mkdir -p ~/www/shared
+RUN mkdir -p ~/www/releases
+
 # NGINX
 RUN apt-add-repository ppa:nginx/stable -y
 RUN apt-get update
@@ -45,8 +56,6 @@ RUN useradd -ms /bin/bash $USER
 RUN echo "$USER:$USER" | chpasswd
 USER $USER
 WORKDIR /home/$USER
-
-RUN mkdir -p ~/www
 
 USER root
 

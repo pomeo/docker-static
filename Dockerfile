@@ -30,6 +30,8 @@ RUN mkdir -p ~/www/logs
 RUN mkdir -p ~/www/shared
 RUN mkdir -p ~/www/releases
 
+USER root
+
 # NGINX
 RUN apt-add-repository ppa:nginx/stable -y
 RUN apt-get update
@@ -49,15 +51,6 @@ RUN echo "[program:nginx]" >> /etc/supervisor/conf.d/main.conf
 RUN echo "command=/usr/sbin/nginx" >> /etc/supervisor/conf.d/main.conf
 RUN echo "[program:ssh]" >> /etc/supervisor/conf.d/main.conf
 RUN echo "command=/usr/sbin/sshd -D" >> /etc/supervisor/conf.d/main.conf
-
-# Add user
-RUN useradd -ms /bin/bash $USER
-
-RUN echo "$USER:$USER" | chpasswd
-USER $USER
-WORKDIR /home/$USER
-
-USER root
 
 RUN echo "/usr/bin/supervisord -n" >> /start.sh
 RUN chmod +x /start.sh
